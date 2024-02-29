@@ -39,25 +39,67 @@ void q_free(struct list_head *head)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head) {
+        return false;
+    }
+
+    element_t *new_element = malloc(sizeof(element_t));
+    if (!new_element) {
+        return false;
+    }
+
+    new_element->value = strdup(s);
+    if (!new_element->value) {
+        free(new_element);
+        return false;
+    }
+
+    list_add(&new_element->list, head);
     return true;
 }
 
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    return true;
+    if (!head) {
+        return false;
+    }
+
+    return q_insert_head(head->prev, s);
 }
 
 /* Remove an element from head of queue */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || list_empty(head)) {
+        return NULL;
+    }
+
+    element_t *element = list_first_entry(head, element_t, list);
+    list_del(&element->list);
+
+    if (sp && bufsize) {
+        strncpy(sp, element->value, bufsize);
+    }
+
+    return element;
 }
 
 /* Remove an element from tail of queue */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || list_empty(head)) {
+        return NULL;
+    }
+
+    element_t *element = list_last_entry(head, element_t, list);
+    list_del(&element->list);
+
+    if (sp && bufsize) {
+        strncpy(sp, element->value, bufsize);
+    }
+
+    return element;
 }
 
 /* Return number of elements in queue */
